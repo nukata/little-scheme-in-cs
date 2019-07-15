@@ -1,11 +1,15 @@
-# A Little Scheme in C# 7
+# A Little Scheme in C#
 
-This is a small interpreter of a subset of Scheme.
+This is a small interpreter of a subset of Scheme
+in circa 1,000 lines of _C# 7_
+(including a small arithmetic library
+[`arith.cs`](arith.cs) in circa 300 lines).
 It implements the same language as
-[little-scheme-in-python](https://github.com/nukata/little-scheme-in-python)
-(and also its meta-circular interpreter, 
-[little-scheme](https://github.com/nukata/little-scheme))
-in circa 1,000 lines of C# 7.
+[little-scheme-in-python](https://github.com/nukata/little-scheme-in-python),
+[little-scheme-in-go](https://github.com/nukata/little-scheme-in-go),
+[little-scheme-in-java](https://github.com/nukata/little-scheme-in-java)
+and their meta-circular interpreter, 
+[little-scheme](https://github.com/nukata/little-scheme).
 
 As a Scheme implementation, 
 it optimizes _tail calls_ and handles _first-class continuations_ properly.
@@ -126,5 +130,54 @@ ot null? pair? eqv? eq? cons cdr car fibonacci)
 | continuations                       | `class Continuation`                |
 
 
-For expression types and built-in procedures, see
-[little-scheme-in-python](https://github.com/nukata/little-scheme-in-python).
+The implementation is similar to those of
+[little-scheme-in-dart](https://github.com/nukata/little-scheme-in-dart) and
+[little-scheme-in-java](https://github.com/nukata/little-scheme-in-java).
+
+
+### Expression types
+
+- _v_  [variable reference]
+
+- (_e0_ _e1_...)  [procedure call]
+
+- (`quote` _e_)  
+  `'`_e_ [transformed into (`quote` _e_) when read]
+
+- (`if` _e1_ _e2_ _e3_)  
+  (`if` _e1_ _e2_)
+
+- (`begin` _e_...)
+
+- (`lambda` (_v_...) _e_...)
+
+- (`set!` _v_ _e_)
+
+- (`define` _v_ _e_)
+
+For simplicity, this Scheme treats (`define` _v_ _e_) as an expression type.
+
+
+### Built-in procedures
+
+|                      |                       |                     |
+|:---------------------|:----------------------|:--------------------|
+| (`car` _lst_)        | (`not` _x_)           | (`eof-object?` _x_) |
+| (`cdr` _lst_)        | (`list` _x_ ...)      | (`symbol?` _x_)     |
+| (`cons` _x_ _y_)     | (`call/cc` _fun_)     | (`+` _x_ _y_)       |
+| (`eq?` _x_ _y_)      | (`apply` _fun_ _arg_) | (`-` _x_ _y_)       |
+| (`eqv?` _x_ _y_)     | (`display` _x_)       | (`*` _x_ _y_)       |
+| (`pair?` _x_)        | (`newline`)           | (`<` _x_ _y_)       |
+| (`null?` _x_)        | (`read`)              | (`=` _x_ _y_)       |
+|                      |                       | (`globals`)         |
+
+`(globals)` returns a list of keys of the global environment.
+It is not in the standard.
+
+See [`GlobalEnv`](scm.cs#L321-L372)
+in `scm.cs` for the implementation of the procedures
+except `call/cc` and `apply`.  
+`call/cc` and `apply` are implemented particularly at 
+[`ApplyFunction`](scm.cs#L506-L543) in `scm.cs`.
+
+I hope this serves as a model of how to write a Scheme interpreter in C#.

@@ -1,6 +1,8 @@
-// A little arithmetic in C# 7, R01.07.14 by SUZUKI Hisao
+// A little arithmetic in C# 7, R01.07.14/R01.07.15 by SUZUKI Hisao
 using System;
 using System.Numerics;          // This implies /r:System.Numerics.dll
+
+// test: csc /d:TEST /o /r:System.Numerics.dll arith.cs && mono arith.exe
 
 namespace LittleArith {
     /// <summary>Mixed mode arithmetic of int, double and BigInteger

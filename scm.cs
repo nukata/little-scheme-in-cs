@@ -1,4 +1,4 @@
-// A little Scheme in C# 7, v0.1 R01.07.14 by SUZUKI Hisao
+// A little Scheme in C# 7, v0.1 R01.07.14/R01.07.15 by SUZUKI Hisao
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -281,7 +281,7 @@ namespace LittleScheme {
                 var ss = new List<string>();
                 foreach (Environment e in env) {
                     if (e == GlobalEnv) {
-                        ss.Add("GlbalEnv");
+                        ss.Add("GlobalEnv");
                         break;
                     } else if (e.Symbol == null) { // frame marker
                         ss.Add("|");
@@ -419,6 +419,7 @@ namespace LittleScheme {
                         }
                     }
                     for (;;) {
+                        // Console.Write("_{0}", k.Count);
                         if (k.Count == 0)
                             return exp;
                         var (op, x) = k.Pop();
@@ -446,7 +447,7 @@ namespace LittleScheme {
                             goto evaluateExp;
                         }
                         case ContOp.Define: // x is a variable name.
-                            Debug.Assert(env.Symbol == null); // frame top?
+                            Debug.Assert(env.Symbol == null); // frame marker?
                             env.Next = new Environment((Sym) x, exp, env.Next);
                             exp = None;
                             break;
@@ -540,6 +541,7 @@ namespace LittleScheme {
                      Stringify(arg));
             }
         }
+
     // ----------------------------------------------------------------------
 
         /// <summary>Split a string into a list of tokens.</summary>
