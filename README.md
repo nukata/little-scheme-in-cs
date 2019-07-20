@@ -5,9 +5,11 @@ in circa 1,000 lines of _C# 7_
 (including a small arithmetic library
 [`arith.cs`](arith.cs) in circa 300 lines).
 It implements the same language as
-[little-scheme-in-python](https://github.com/nukata/little-scheme-in-python),
-[little-scheme-in-go](https://github.com/nukata/little-scheme-in-go),
-[little-scheme-in-java](https://github.com/nukata/little-scheme-in-java)
+
+- [little-scheme-in-python](https://github.com/nukata/little-scheme-in-python)
+- [little-scheme-in-go](https://github.com/nukata/little-scheme-in-go)
+- [little-scheme-in-java](https://github.com/nukata/little-scheme-in-java)
+
 and their meta-circular interpreter, 
 [little-scheme](https://github.com/nukata/little-scheme).
 
@@ -92,6 +94,8 @@ $ mono scm.exe ../little-scheme/examples/yin-yang-puzzle.scm | head
 ^C
 $ mono scm.exe ../little-scheme/examples/amb.scm
 ((1 A) (1 B) (1 C) (2 A) (2 B) (2 C) (3 A) (3 B) (3 C))
+$ mono scm.exe ../little-scheme/examples/nqueens.scm
+((5 3 1 6 4 2) (4 1 5 2 6 3) (3 6 2 5 1 4) (2 4 6 1 3 5))
 $ mono scm.exe ../little-scheme/scm.scm < ../little-scheme/examples/nqueens.scm
 ((5 3 1 6 4 2) (4 1 5 2 6 3) (3 6 2 5 1 4) (2 4 6 1 3 5))
 $ 

@@ -1,4 +1,4 @@
-// A little Scheme in C# 7, v0.1 R01.07.14/R01.07.21 by SUZUKI Hisao
+// A little Scheme in C# 7, v1.0 R01.07.14/R01.07.21 by SUZUKI Hisao
 using System;
 using System.Collections;
 using System.Collections.Generic;
