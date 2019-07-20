@@ -1,4 +1,4 @@
-// A little Scheme in C# 7, v0.1 R01.07.14/R01.07.15 by SUZUKI Hisao
+// A little Scheme in C# 7, v0.1 R01.07.14/R01.07.21 by SUZUKI Hisao
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -248,6 +248,16 @@ namespace LittleScheme {
 
     // ----------------------------------------------------------------------
 
+    /// <summary>Exception thrown by error procedure of SRFI-23</summary>
+    public class ErrorException: Exception {
+        /// <summary>Construct an exception with error arguments.</summary>
+        public ErrorException(object reason, object arg):
+            base($"Error: {LS.Stringify(reason, false)}: {LS.Stringify(arg)}")
+            {}
+    }
+
+    // ----------------------------------------------------------------------
+
     /// <summary>Little Scheme's common values and functions</summary>
     public static class LS {
         /// <summary>A uique value which means the expression has no value
@@ -325,12 +335,15 @@ namespace LittleScheme {
                   c("<", 2, x => Arith.Compare(x.Car, ((Cell) x.Cdr).Car) < 0,
                     c("=", 2,
                       x => Arith.Compare(x.Car, ((Cell) x.Cdr).Car) == 0,
-                      c("globals", 0, x => Globals(),
-                        new Environment
-                        (Sym.CallCC, Sym.CallCC,
-                         new Environment
-                         (Sym.Apply, Sym.Apply,
-                          null))))))));
+                      c("error", 2,
+                        x => throw new ErrorException(x.Car,
+                                                      ((Cell) x.Cdr).Car),
+                        c("globals", 0, x => Globals(),
+                          new Environment
+                          (Sym.CallCC, Sym.CallCC,
+                           new Environment
+                           (Sym.Apply, Sym.Apply,
+                            null)))))))));
 
         /// <summary>The Global environment</summary>
         public static readonly Environment GlobalEnv = new Environment
@@ -496,6 +509,8 @@ namespace LittleScheme {
                         }
                     }
                 }
+            } catch (ErrorException) {
+                throw;
             } catch (Exception ex) {
                 if (k.Count == 0) throw;
                 throw new Exception(ex.GetType().Name + ": " + ex.Message +

@@ -52,7 +52,7 @@ $ dotnet build -c Release
 Microsoft (R) Build Engine version 16.1.76+g14b0a930a7 for .NET Core
 Copyright (C) Microsoft Corporation. All rights reserved.
 
-  Restore completed in 180.08 ms for /Users/suzuki/proj/little-scheme-in-cs/scm.
+  Restore completed in 176.43 ms for /Users/suzuki/proj/little-scheme-in-cs/scm.
 csproj.
   scm -> /Users/suzuki/proj/little-scheme-in-cs/bin/Release/netcoreapp2.2/scm.dl
 l
@@ -61,7 +61,7 @@ Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:01.28
+Time Elapsed 00:00:01.25
 $ dotnet bin/Release/netcoreapp2.2/scm.dll
 > (+ 5 6)
 11
@@ -73,7 +73,9 @@ And so on.
 
 You can run it with a Scheme script.
 Examples are found in 
-[little-scheme](https://github.com/nukata/little-scheme).
+[little-scheme](https://github.com/nukata/little-scheme);
+download it at `..` and you can try the following:
+
 
 ```
 $ mono scm.exe ../little-scheme/examples/yin-yang-puzzle.scm | head
@@ -88,6 +90,8 @@ $ mono scm.exe ../little-scheme/examples/yin-yang-puzzle.scm | head
 ********
 *********
 ^C
+$ mono scm.exe ../little-scheme/examples/amb.scm
+((1 A) (1 B) (1 C) (2 A) (2 B) (2 C) (3 A) (3 B) (3 C))
 $ mono scm.exe ../little-scheme/scm.scm < ../little-scheme/examples/nqueens.scm
 ((5 3 1 6 4 2) (4 1 5 2 6 3) (3 6 2 5 1 4) (2 4 6 1 3 5))
 $ 
@@ -102,8 +106,8 @@ after running the script.
 $ mono scm.exe ../little-scheme/examples/fib90.scm -
 2880067194370816120
 > (globals)
-(apply call/cc globals = < * - + symbol? eof-object? read newline display list n
-ot null? pair? eqv? eq? cons cdr car fibonacci)
+(apply call/cc globals error = < * - + symbol? eof-object? read newline display
+list not null? pair? eqv? eq? cons cdr car fibonacci)
 > (fibonacci 16)
 987
 > (fibonacci 1000)
@@ -160,24 +164,28 @@ For simplicity, this Scheme treats (`define` _v_ _e_) as an expression type.
 
 ### Built-in procedures
 
-|                      |                       |                     |
-|:---------------------|:----------------------|:--------------------|
-| (`car` _lst_)        | (`not` _x_)           | (`eof-object?` _x_) |
-| (`cdr` _lst_)        | (`list` _x_ ...)      | (`symbol?` _x_)     |
-| (`cons` _x_ _y_)     | (`call/cc` _fun_)     | (`+` _x_ _y_)       |
-| (`eq?` _x_ _y_)      | (`apply` _fun_ _arg_) | (`-` _x_ _y_)       |
-| (`eqv?` _x_ _y_)     | (`display` _x_)       | (`*` _x_ _y_)       |
-| (`pair?` _x_)        | (`newline`)           | (`<` _x_ _y_)       |
-| (`null?` _x_)        | (`read`)              | (`=` _x_ _y_)       |
-|                      |                       | (`globals`)         |
+|                      |                          |                     |
+|:---------------------|:-------------------------|:--------------------|
+| (`car` _lst_)        | (`not` _x_)              | (`eof-object?` _x_) |
+| (`cdr` _lst_)        | (`list` _x_ ...)         | (`symbol?` _x_)     |
+| (`cons` _x_ _y_)     | (`call/cc` _fun_)        | (`+` _x_ _y_)       |
+| (`eq?` _x_ _y_)      | (`apply` _fun_ _arg_)    | (`-` _x_ _y_)       |
+| (`eqv?` _x_ _y_)     | (`display` _x_)          | (`*` _x_ _y_)       |
+| (`pair?` _x_)        | (`newline`)              | (`<` _x_ _y_)       |
+| (`null?` _x_)        | (`read`)                 | (`=` _x_ _y_)       |
+|                      | (`error` _reason_ _arg_) | (`globals`)         |
 
-`(globals)` returns a list of keys of the global environment.
-It is not in the standard.
+- `(error` _reason_ _arg_`)` throws an exception with the message
+  "`Error:` _reason_`:` _arg_".
+  It is based on [SRFI-23](https://srfi.schemers.org/srfi-23/srfi-23.html).
 
-See [`GlobalEnv`](scm.cs#L321-L372)
+- `(globals)` returns a list of keys of the global environment.
+  It is not in the standard.
+
+See [`GlobalEnv`](scm.cs#L331-L385)
 in `scm.cs` for the implementation of the procedures
 except `call/cc` and `apply`.  
 `call/cc` and `apply` are implemented particularly at 
-[`ApplyFunction`](scm.cs#L506-L543) in `scm.cs`.
+[`ApplyFunction`](scm.cs#L521-L558) in `scm.cs`.
 
 I hope this serves as a model of how to write a Scheme interpreter in C#.
