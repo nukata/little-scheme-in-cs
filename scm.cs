@@ -1,4 +1,4 @@
-// A little Scheme in C# 7, v1.0 R01.07.14/R01.07.21 by SUZUKI Hisao
+// A little Scheme in C# 7, v1.0.1 R01.07.14/R01.11.14 by SUZUKI Hisao
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using LittleArith;
 
-// scm.exe: csc /doc:scm.xml /o /r:System.Numerics.dll arith.cs scm.cs
+// scm.exe: csc -doc:scm.xml -o -r:System.Numerics.dll scm.cs arith.cs
 // doc: mdoc update -i scm.xml -o xml scm.exe; mdoc export-html -o html xml
 
 namespace LittleScheme {
@@ -306,6 +306,13 @@ namespace LittleScheme {
                     ":" + Stringify(cf.Env) + ">";
             } else if (exp is string s && quote) {
                 return "\"" + s + "\"";
+            } else if (exp is double d) { // 123.0 => "123.0"
+                string ds = d.ToString();
+                unchecked {
+                    if (((long) d).ToString() == ds)
+                        ds += ".0";
+                }
+                return ds;
             }
             return $"{exp}";
         }

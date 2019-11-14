@@ -1,8 +1,8 @@
-// A little arithmetic in C# 7, R01.07.14/R01.07.15 by SUZUKI Hisao
+// A little arithmetic in C# 7, R01.07.14/R01.11.14 by SUZUKI Hisao
 using System;
 using System.Numerics;          // This implies /r:System.Numerics.dll
 
-// test: csc /d:TEST /o /r:System.Numerics.dll arith.cs && mono arith.exe
+// test: csc -d:TEST -o -r:System.Numerics.dll arith.cs && mono arith.exe
 
 namespace LittleArith {
     /// <summary>Mixed mode arithmetic of int, double and BigInteger
@@ -11,13 +11,12 @@ namespace LittleArith {
     public static class Arith {
         /// <summary>Convert a long into an int or a BigInteger.</summary>
         private static object Normalize(long x) {
-            int i = (int) x;
-            // NB: ((i == x) ? i : (BigInteger) x) will be a BigInteger.
-            if (i == x) {
-                return i;
-            } else {
-                return (BigInteger) x;
+            unchecked {
+                int i = (int) x;
+                if (i == x)
+                    return i;
             }
+            return (BigInteger) x;
         }
 
         /// <summary>Convert a BigInteger into an int if possible.</summary>

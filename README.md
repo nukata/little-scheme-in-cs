@@ -186,10 +186,10 @@ For simplicity, this Scheme treats (`define` _v_ _e_) as an expression type.
 - `(globals)` returns a list of keys of the global environment.
   It is not in the standard.
 
-See [`GlobalEnv`](scm.cs#L331-L385)
+See [`GlobalEnv`](scm.cs#L338-L392)
 in `scm.cs` for the implementation of the procedures
 except `call/cc` and `apply`.  
 `call/cc` and `apply` are implemented particularly at 
-[`ApplyFunction`](scm.cs#L521-L558) in `scm.cs`.
+[`ApplyFunction`](scm.cs#L528-L565) in `scm.cs`.
 
 I hope this serves as a model of how to write a Scheme interpreter in C#.
