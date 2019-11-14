@@ -6,9 +6,11 @@ in circa 1,000 lines of _C# 7_
 [`arith.cs`](arith.cs) in circa 300 lines).
 It implements the same language as
 
-- [little-scheme-in-python](https://github.com/nukata/little-scheme-in-python)
+- [little-scheme-in-dart](https://github.com/nukata/little-scheme-in-dart)
 - [little-scheme-in-go](https://github.com/nukata/little-scheme-in-go)
 - [little-scheme-in-java](https://github.com/nukata/little-scheme-in-java)
+- [little-scheme-in-python](https://github.com/nukata/little-scheme-in-python)
+- [little-scheme-in-typescript](https://github.com/nukata/little-scheme-in-typescript)
 
 and their meta-circular interpreter, 
 [little-scheme](https://github.com/nukata/little-scheme).
@@ -19,11 +21,11 @@ it optimizes _tail calls_ and handles _first-class continuations_ properly.
 
 ## How to run
 
-With [Mono](https://www.mono-project.com) 5.20:
+With [Mono](https://www.mono-project.com) 6.4.0:
 
 ```
-$ csc /o /r:System.Numerics.dll arith.cs scm.cs
-Microsoft (R) Visual C# Compiler version 2.8.2.62916 (2ad4aabc)
+$ csc -o -r:System.Numerics.dll arith.cs scm.cs
+Microsoft (R) Visual C# Compiler version 3.3.1-beta4-19462-11 (66a912c9)
 Copyright (C) Microsoft Corporation. All rights reserved.
 
 $ mono scm.exe
@@ -47,24 +49,24 @@ Press EOF (e.g. Control-D) to exit the session.
 $ 
 ```
 
-With [.NET Core](https://github.com/dotnet/core) 2.2:
+With [.NET Core](https://github.com/dotnet/core) 3.0:
 
 ```
 $ dotnet build -c Release
-Microsoft (R) Build Engine version 16.1.76+g14b0a930a7 for .NET Core
+Microsoft (R) Build Engine version 16.3.0+0f4c62fea for .NET Core
 Copyright (C) Microsoft Corporation. All rights reserved.
 
-  Restore completed in 176.43 ms for /Users/suzuki/proj/little-scheme-in-cs/scm.
-csproj.
-  scm -> /Users/suzuki/proj/little-scheme-in-cs/bin/Release/netcoreapp2.2/scm.dl
+  Restore completed in 80.7 ms for /Users/suzuki/proj/little-scheme-in-cs/scm.cs
+proj.
+  scm -> /Users/suzuki/proj/little-scheme-in-cs/bin/Release/netcoreapp3.0/scm.dl
 l
 
 Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:01.25
-$ dotnet bin/Release/netcoreapp2.2/scm.dll
+Time Elapsed 00:00:02.68
+$ dotnet bin/Release/netcoreapp3.0/scm.dll
 > (+ 5 6)
 11
 > 
