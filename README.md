@@ -49,24 +49,24 @@ Press EOF (e.g. Control-D) to exit the session.
 $ 
 ```
 
-With [.NET Core](https://github.com/dotnet/core) 3.0:
+With [.NET Core](https://github.com/dotnet/core) 3.1:
 
 ```
 $ dotnet build -c Release
-Microsoft (R) Build Engine version 16.3.0+0f4c62fea for .NET Core
+Microsoft (R) Build Engine version 16.4.0+e901037fe for .NET Core
 Copyright (C) Microsoft Corporation. All rights reserved.
 
-  Restore completed in 80.7 ms for /Users/suzuki/proj/little-scheme-in-cs/scm.cs
-proj.
-  scm -> /Users/suzuki/proj/little-scheme-in-cs/bin/Release/netcoreapp3.0/scm.dl
+  Restore completed in 125.36 ms for /Users/suzuki/proj/little-scheme-in-cs/scm.
+csproj.
+  scm -> /Users/suzuki/proj/little-scheme-in-cs/bin/Release/netcoreapp3.1/scm.dl
 l
 
 Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:02.68
-$ dotnet bin/Release/netcoreapp3.0/scm.dll
+Time Elapsed 00:00:01.27
+$ dotnet bin/Release/netcoreapp3.1/scm.dll
 > (+ 5 6)
 11
 > 
