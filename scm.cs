@@ -1,4 +1,4 @@
-// A little Scheme in C# 7, v1.0.1 R01.07.14/R01.11.14 by SUZUKI Hisao
+// A little Scheme in C# 7, v1.0.2 R01.07.14/R02.03.20 by SUZUKI Hisao
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -89,7 +89,7 @@ namespace LittleScheme {
 
     // ----------------------------------------------------------------------
 
-    /// <summary>Linked list of bindings mapping symbols to values</summary>
+    /// <summary>Linked list of bindings which map symbols to values</summary>
     public sealed class Environment: IEnumerable<Environment> {
         /// <summary>The bound symbol</summary>
         public readonly Sym Symbol;
@@ -126,8 +126,8 @@ namespace LittleScheme {
             throw new KeyNotFoundException(symbol.ToString());
         }
 
-        /// <summary>Build an environment prepending the bindings of symbols
-        /// and data.</summary>
+        /// <summary>Build a new environment by prepending the bindings of
+        /// symbols and data to the present environment.</summary>
         public Environment PrependDefs(Cell symbols, Cell data) {
             if (symbols == null) {
                 if (data != null)
@@ -187,10 +187,10 @@ namespace LittleScheme {
             var ss = new List<string>();
             foreach (var (op, value) in stack)
                 ss.Add($"{op} {LS.Stringify(value)}");
-            return "$<" + String.Join("\n\t  ", ss) + ">";
+            return "#<" + String.Join("\n\t  ", ss) + ">";
         }
 
-        /// <summary>Append a step to the top of the continuation.</summary>
+        /// <summary>Push a step to the top of the continuation.</summary>
         internal void Push(ContOp operation, object value) =>
             stack.Push((operation, value));
 
@@ -260,11 +260,11 @@ namespace LittleScheme {
 
     /// <summary>Little Scheme's common values and functions</summary>
     public static class LS {
-        /// <summary>A uique value which means the expression has no value
+        /// <summary>A unique value which means the expression has no value
         /// </summary>
         public static readonly object None = new Object();
 
-        /// <summary>A unique value which means the Enf Of File</summary>
+        /// <summary>A unique value which means the End Of File</summary>
         public static readonly object EOF = new Object();
 
         /// <summary>Convert an expression to a string.</summary>
@@ -352,7 +352,7 @@ namespace LittleScheme {
                            (Sym.Apply, Sym.Apply,
                             null)))))))));
 
-        /// <summary>The Global environment</summary>
+        /// <summary>The global environment</summary>
         public static readonly Environment GlobalEnv = new Environment
             (null,              // frame marker
              null,
@@ -525,8 +525,8 @@ namespace LittleScheme {
             }
         }
 
-        /// <summary>Apply a function to arguments with a continuation.
-        /// </summary>
+        /// <summary>Apply a function to arguments with a continuation
+        /// and an environment.</summary>
         private static (object result, Environment env) ApplyFunction
         (object fun, Cell arg, Continuation k, Environment env) {
             for (;;) {
@@ -566,9 +566,10 @@ namespace LittleScheme {
 
     // ----------------------------------------------------------------------
 
-        /// <summary>Split a string into a list of tokens.</summary>
-        /// <remarks>For "(a 1)" it returns ["(", "a", "1", ")"].</remarks>
-        public static Queue<string> SplitStringIntoTokens(string source) {
+        /// <summary>Split a string into an abstract sequence of tokens.
+        /// </summary><remarks>For "(a 1)" it yields "(", "a", "1" and ")".
+        /// </remarks>
+        public static IEnumerable<string> SplitStringIntoTokens(string source) {
             var result = new Queue<string>();
             foreach (string line in source.Split('\n')) {
                 var ss = new Queue<string>(); // to store string literals
@@ -589,13 +590,11 @@ namespace LittleScheme {
                 s = s.Replace("(", " ( ");
                 foreach (string e in s.Split(' ', '\f', '\r', '\t', '\v')) {
                     if (e == "#s")
-                        result.Enqueue(ss.Dequeue());
+                        yield return ss.Dequeue();
                     else if (e != "")
-                        result.Enqueue(e);
+                        yield return e;
                 }
-
             }
-            return result;
         }
 
         /// <summary>Read an expression from tokens.</summary><remarks>
@@ -690,7 +689,7 @@ namespace LittleScheme {
         /// <summary>Load a source code from a file.</summary>
         public static void Load(string fileName) {
             String source = File.ReadAllText(fileName, Encoding.UTF8);
-            Queue<string> tokens = SplitStringIntoTokens(source);
+            var tokens = new Queue<string>(SplitStringIntoTokens(source));
             while (tokens.Count != 0) {
                 object exp = ReadFromTokens(tokens);
                 Evaluate(exp, GlobalEnv);
@@ -711,7 +710,7 @@ namespace LittleScheme {
                 LS.ReadEvalPrintLoop();
                 return 0;
             } catch (Exception ex) {
-                Console.WriteLine(ex.ToString());
+                Console.Error.WriteLine(ex.ToString());
                 return 1;
             }
         }

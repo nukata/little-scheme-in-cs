@@ -6,10 +6,12 @@ in circa 1,000 lines of _C# 7_
 [`arith.cs`](arith.cs) in circa 300 lines).
 It implements the same language as
 
+- [little-scheme-in-crystal](https://github.com/nukata/little-scheme-in-crystal)
 - [little-scheme-in-dart](https://github.com/nukata/little-scheme-in-dart)
 - [little-scheme-in-go](https://github.com/nukata/little-scheme-in-go)
 - [little-scheme-in-java](https://github.com/nukata/little-scheme-in-java)
 - [little-scheme-in-python](https://github.com/nukata/little-scheme-in-python)
+- [little-scheme-in-ruby](https://github.com/nukata/little-scheme-in-ruby)
 - [little-scheme-in-typescript](https://github.com/nukata/little-scheme-in-typescript)
 
 and their meta-circular interpreter, 
@@ -21,11 +23,11 @@ it optimizes _tail calls_ and handles _first-class continuations_ properly.
 
 ## How to run
 
-With [Mono](https://www.mono-project.com) 6.4.0:
+With [Mono](https://www.mono-project.com) 6.8.0:
 
 ```
 $ csc -o -r:System.Numerics.dll arith.cs scm.cs
-Microsoft (R) Visual C# Compiler version 3.3.1-beta4-19462-11 (66a912c9)
+Microsoft (R) Visual C# Compiler version 3.5.0-beta1-19606-04 (d2bd58c6)
 Copyright (C) Microsoft Corporation. All rights reserved.
 
 $ mono scm.exe
@@ -49,14 +51,14 @@ Press EOF (e.g. Control-D) to exit the session.
 $ 
 ```
 
-With [.NET Core](https://github.com/dotnet/core) 3.1:
+With [.NET Core](https://github.com/dotnet/core) 3.1.2:
 
 ```
 $ dotnet build -c Release
-Microsoft (R) Build Engine version 16.4.0+e901037fe for .NET Core
+Microsoft (R) Build Engine version 16.5.0+d4cbfca49 for .NET Core
 Copyright (C) Microsoft Corporation. All rights reserved.
 
-  Restore completed in 125.36 ms for /Users/suzuki/proj/little-scheme-in-cs/scm.
+  Restore completed in 126.31 ms for /Users/suzuki/proj/little-scheme-in-cs/scm.
 csproj.
   scm -> /Users/suzuki/proj/little-scheme-in-cs/bin/Release/netcoreapp3.1/scm.dl
 l
@@ -65,7 +67,7 @@ Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:01.27
+Time Elapsed 00:00:01.11
 $ dotnet bin/Release/netcoreapp3.1/scm.dll
 > (+ 5 6)
 11
