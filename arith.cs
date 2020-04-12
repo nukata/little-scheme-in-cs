@@ -1,4 +1,4 @@
-// A little arithmetic in C# 7, R01.07.14/R01.11.14 by SUZUKI Hisao
+// A little arithmetic in C# 8, R01.07.14/R02.04.12 by SUZUKI Hisao
 using System;
 using System.Numerics;          // This implies /r:System.Numerics.dll
 
@@ -9,6 +9,11 @@ namespace LittleArith {
     /// </summary><remarks>For values of other types, the methods of
     /// this class will throw ArgumentException.</remarks>
     public static class Arith {
+        /// <summary>Is x a number?</summary>
+        public static bool IsNumeric(object x) {
+            return x is int || x is double || x is BigInteger;
+        }
+
         /// <summary>Convert a long into an int or a BigInteger.</summary>
         private static object Normalize(long x) {
             unchecked {
@@ -29,154 +34,66 @@ namespace LittleArith {
         }
 
         /// <summary>x + y</summary>
-        public static object Add(object x, object y) {
-            switch (x) {
-            case int a:
-                switch (y) {
-                case int b:
-                    return Normalize((long) a + (long) b);
-                case double b:
-                    return a + b;
-                case BigInteger b:
-                    return Normalize(a + b);
-                }
-                break;
-            case double a:
-                switch (y) {
-                case int b:
-                    return a + b;
-                case double b:
-                    return a + b;
-                case BigInteger b:
-                    return a + (double) b;
-                }
-                break;
-            case BigInteger a:
-                switch (y) {
-                case int b:
-                    return Normalize(a + b);
-                case double b:
-                    return (double) a + b;
-                case BigInteger b:
-                    return Normalize(a + b);
-                }
-                break;
-            }
-            throw new ArgumentException($"{x}, {y}");
-        }
+        public static object Add(object x, object y) => (x, y) switch
+            {
+             (int a, int b) => Normalize((long) a + (long) b),
+             (int a, double b) => a + b,
+             (int a, BigInteger b) => Normalize(a + b),
+             (double a, int b) => a + b,
+             (double a, double b) => a + b,
+             (double a, BigInteger b) => a + (double) b,
+             (BigInteger a, int b) => Normalize(a + b),
+             (BigInteger a, double b) => (double) a + b,
+             (BigInteger a, BigInteger b) => Normalize(a + b),
+             (_, _) => throw new ArgumentException($"{x}, {y}")
+            };
 
         /// <summary>x - y</summary>
-        public static object Subtract(object x, object y) {
-            switch (x) {
-            case int a:
-                switch (y) {
-                case int b:
-                    return Normalize((long) a - (long) b);
-                case double b:
-                    return a - b;
-                case BigInteger b:
-                    return Normalize(a - b);
-                }
-                break;
-            case double a:
-                switch (y) {
-                case int b:
-                    return a - b;
-                case double b:
-                    return a - b;
-                case BigInteger b:
-                    return a - (double) b;
-                }
-                break;
-            case BigInteger a:
-                switch (y) {
-                case int b:
-                    return Normalize(a - b);
-                case double b:
-                    return (double) a - b;
-                case BigInteger b:
-                    return Normalize(a - b);
-                }
-                break;
-            }
-            throw new ArgumentException($"{x}, {y}");
-        }
+        public static object Subtract(object x, object y) => (x, y) switch
+            {
+             (int a, int b) => Normalize((long) a - (long) b),
+             (int a, double b) => a - b,
+             (int a, BigInteger b) => Normalize(a - b),
+             (double a, int b) => a - b,
+             (double a, double b) => a - b,
+             (double a, BigInteger b) => a - (double) b,
+             (BigInteger a, int b) => Normalize(a - b),
+             (BigInteger a, double b) => (double) a - b,
+             (BigInteger a, BigInteger b) => Normalize(a - b),
+             (_, _) => throw new ArgumentException($"{x}, {y}")
+            };
 
         /// <summary>x * y</summary>
-        public static object Multiply(object x, object y) {
-            switch (x) {
-            case int a:
-                switch (y) {
-                case int b:
-                    return Normalize((long) a * (long) b);
-                case double b:
-                    return a * b;
-                case BigInteger b:
-                    return Normalize(a * b);
-                }
-                break;
-            case double a:
-                switch (y) {
-                case int b:
-                    return a * b;
-                case double b:
-                    return a * b;
-                case BigInteger b:
-                    return a * (double) b;
-                }
-                break;
-            case BigInteger a:
-                switch (y) {
-                case int b:
-                    return Normalize(a * b);
-                case double b:
-                    return (double) a * b;
-                case BigInteger b:
-                    return Normalize(a * b);
-                }
-                break;
-            }
-            throw new ArgumentException($"{x}, {y}");
-        }
+        public static object Multiply(object x, object y) => (x, y) switch
+            {
+             (int a, int b) => Normalize((long) a * (long) b),
+             (int a, double b) => a * b,
+             (int a, BigInteger b) => Normalize(a * b),
+             (double a, int b) => a * b,
+             (double a, double b) => a * b,
+             (double a, BigInteger b) => a * (double) b,
+             (BigInteger a, int b) => Normalize(a * b),
+             (BigInteger a, double b) => (double) a * b,
+             (BigInteger a, BigInteger b) => Normalize(a * b),
+             (_, _) => throw new ArgumentException($"{x}, {y}")
+            };
 
         /// <summary>Compare x and y.</summary>
         /// <returns>-1, 0 or 1 as x is less than, equal to, or greater than y.
         /// </returns>
-        public static int Compare(object x, object y) {
-            switch (x) {
-            case int a:
-                switch (y) {
-                case int b:
-                    return Math.Sign((long) a - (long) b);
-                case double b:
-                    return Math.Sign(a - b);
-                case BigInteger b:
-                    return (a - b).Sign;
-                }
-                break;
-            case double a:
-                switch (y) {
-                case int b:
-                    return Math.Sign(a - b);
-                case double b:
-                    return Math.Sign(a - b);
-                case BigInteger b:
-                    return Math.Sign(a - (double) b);
-                }
-                break;
-            case BigInteger a:
-                switch (y) {
-                case int b:
-                    return (a - b).Sign;
-                case double b:
-                    return Math.Sign((double) a - b);
-                case BigInteger b:
-                    return (a - b).Sign;
-                }
-                break;
-            }
-            throw new ArgumentException($"{x}, {y}");
-        }
+        public static int Compare(object x, object y) => (x, y) switch
+            {
+             (int a, int b) => Math.Sign((long) a - (long) b),
+             (int a, double b) => Math.Sign(a - b),
+             (int a, BigInteger b) => (a - b).Sign,
+             (double a, int b) => Math.Sign(a - b),
+             (double a, double b) => Math.Sign(a - b),
+             (double a, BigInteger b) => Math.Sign(a - (double) b),
+             (BigInteger a, int b) => (a - b).Sign,
+             (BigInteger a, double b) => Math.Sign((double) a - b),
+             (BigInteger a, BigInteger b) => (a - b).Sign,
+             (_, _) => throw new ArgumentException($"{x}, {y}")
+            };
 
         /// <summary>Try to parse a string as an int, a BigInteger or a double.
         /// </summary>

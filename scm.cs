@@ -1,4 +1,4 @@
-// A little Scheme in C# 7, v1.0.2 R01.07.14/R02.03.20 by SUZUKI Hisao
+// A Little Scheme in C# 8, v1.1 R01.07.14/R02.04.12 by SUZUKI Hisao
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,11 +20,8 @@ namespace LittleScheme {
         public object Cdr;
 
         /// <summary>Construct a cons cell with its head and tail.</summary>
-        public Cell(object car, object cdr) {
-            Car = car;
-            Cdr = cdr;
-        }
- 
+        public Cell(object car, object cdr) => (Car, Cdr) = (car, cdr);
+
         /// <summary>Yield car, cadr, caddr and so on.</summary>
         /// <exception cref="ImproperListException">The list ends with
         /// a non-null value.</exception>
@@ -39,6 +36,17 @@ namespace LittleScheme {
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <summary>Length as a list (an O(n) operation)</summary>
+        public int Count() {
+            int result = 0;
+            Cell j = this;
+            while (j != null) {
+                result++;
+                j = (Cell) j.Cdr;
+            }
+            return result;
+        } // Enumerable.Count which invokes GetEnumerator is slow.
     }
 
     /// <summary>The last tail of the list is not null.</summary>
@@ -47,9 +55,7 @@ namespace LittleScheme {
         public readonly object Tail;
 
         /// <summary>Construct with the last tail which is not null.</summary>
-        public ImproperListException(object tail) {
-            Tail = tail;
-        }
+        public ImproperListException(object tail) => Tail = tail;
     }
 
     // ----------------------------------------------------------------------
@@ -60,9 +66,7 @@ namespace LittleScheme {
         private readonly string Name;
 
         /// <summary>Construct a symbol that is not interned yet.</summary>
-        private Sym(string name) {
-            Name = name;
-        }
+        private Sym(string name) => Name = name;
 
         /// <summary>Return the symbol's name</summary>
         public override string ToString() => Name;
@@ -99,11 +103,8 @@ namespace LittleScheme {
         public Environment Next;
 
         /// <summary>Construct a binding on the top of next.</summary>
-        public Environment(Sym symbol, object value, Environment next) {
-            Symbol = symbol;
-            Value = value;
-            Next = next;
-        }
+        public Environment(Sym symbol, object value, Environment next) =>
+            (Symbol, Value, Next) = (symbol, value, next);
 
         /// <summary>Yield each binding.</summary>
         public IEnumerator<Environment> GetEnumerator() {
@@ -120,9 +121,13 @@ namespace LittleScheme {
         /// <exception cref="KeyNotFoundException">The symbol is not
         /// found in this environment.</exception>
         public Environment LookFor(Sym symbol) {
-            foreach (var env in this)
+            var env = this;
+            while (env != null) {
                 if (Object.ReferenceEquals(env.Symbol, symbol))
                     return env;
+                env = env.Next;
+            }
+            // foreach (var env in this) ... is slow.
             throw new KeyNotFoundException(symbol.ToString());
         }
 
@@ -165,19 +170,16 @@ namespace LittleScheme {
         private Stack<(ContOp, object)> stack;
 
         /// <summary>Construct an empty continuation.</summary>
-        public Continuation() {
+        public Continuation() =>
             stack = new Stack<(ContOp, object)>();
-        }
 
         /// <summary>Construct a copy of another continuation.</summary>
-        public Continuation(Continuation other) {
+        public Continuation(Continuation other) =>
             stack = new Stack<(ContOp, object)>(other.stack);
-        }
 
         /// <summary>Copy steps from another continuation.</summary>
-        public void CopyFrom(Continuation other) {
+        public void CopyFrom(Continuation other) =>
             stack = new Stack<(ContOp, object)>(other.stack);
-        }
 
         /// <summary>Length of the continuation (an O(1) operation)</summary>
         public int Count => stack.Count;
@@ -219,11 +221,8 @@ namespace LittleScheme {
         public readonly Environment Env;
 
         /// <summary>Construct a new lambda expression.</summary>
-        public Closure(Cell parameters, Cell body, Environment env) {
-            Params = parameters;
-            Body = body;
-            Env = env;
-        }
+        public Closure(Cell parameters, Cell body, Environment env) =>
+            (Params, Body, Env) = (parameters, body, env);
     }
 
     /// <summary>Built-in function</summary>
@@ -236,11 +235,8 @@ namespace LittleScheme {
         public readonly Func<Cell, object> Fun;
 
         /// <summary>Construct a new built-in function.</summary>
-        public Intrinsic(string name, int arity, Func<Cell, object> fun) {
-            Name = name;
-            Arity = arity;
-            Fun = fun;
-        }
+        public Intrinsic(string name, int arity, Func<Cell, object> fun) =>
+            (Name, Arity, Fun) = (name, arity, fun);
 
         /// <summary>Return a string which shows its name and arity.</summary>
         public override string ToString() => $"#<{Name}:{Arity}>";
@@ -267,6 +263,14 @@ namespace LittleScheme {
         /// <summary>A unique value which means the End Of File</summary>
         public static readonly object EOF = new Object();
 
+        /// <summary>A unique value which represents the call/cc procedure
+        /// </summary>
+        public static readonly object CallCCVal = new Object();
+
+        /// <summary>A unique value which represents the apply procedure
+        /// </summary>
+        public static readonly object ApplyVal = new Object();
+
         /// <summary>Convert an expression to a string.</summary>
         public static string Stringify(object exp, bool quote = true) {
             if (exp == null) {
@@ -275,6 +279,10 @@ namespace LittleScheme {
                 return "#<VOID>";
             } else if (exp == EOF) {
                 return "#<EOF>";
+            } else if (exp == CallCCVal) {
+                return "#<call/cc>";
+            } else if (exp == ApplyVal) {
+                return "#<apply>";
             } else if (exp is bool b) {
                 return b ? "#t" : "#f";
             } else if (exp is Cell j) {
@@ -342,15 +350,12 @@ namespace LittleScheme {
                   c("<", 2, x => Arith.Compare(x.Car, ((Cell) x.Cdr).Car) < 0,
                     c("=", 2,
                       x => Arith.Compare(x.Car, ((Cell) x.Cdr).Car) == 0,
-                      c("error", 2,
-                        x => throw new ErrorException(x.Car,
-                                                      ((Cell) x.Cdr).Car),
-                        c("globals", 0, x => Globals(),
-                          new Environment
-                          (Sym.CallCC, Sym.CallCC,
-                           new Environment
-                           (Sym.Apply, Sym.Apply,
-                            null)))))))));
+                      c("number?", 1, x => Arith.IsNumeric(x.Car),
+                        c("error", 2,
+                          x => throw new ErrorException(x.Car,
+                                                        ((Cell) x.Cdr).Car),
+                          c("globals", 0, x => Globals(),
+                            null))))))));
 
         /// <summary>The global environment</summary>
         public static readonly Environment GlobalEnv = new Environment
@@ -361,35 +366,28 @@ namespace LittleScheme {
                  c("cons", 2, x => new Cell(x.Car, ((Cell) x.Cdr).Car),
                    c("eq?", 2, x =>
                      Object.ReferenceEquals(x.Car, ((Cell) x.Cdr).Car),
-                     c("eqv?", 2,
-                       x => {
-                           object a = x.Car;
-                           object b = ((Cell) x.Cdr).Car;
-                           if (a == b) return true;
-                           try {
-                               return Arith.Compare(a, b) == 0;
-                           } catch (ArgumentException) {
-                               return false;
-                           }
-                       },
-                       c("pair?", 1, x => x.Car is Cell,
-                         c("null?", 1, x => x.Car == null,
-                           c("not", 1, x => (x.Car is bool b && !b),
-                             c("list", -1, x => x,
-                               c("display", 1,
-                                 x => {
+                     c("pair?", 1, x => x.Car is Cell,
+                       c("null?", 1, x => x.Car == null,
+                         c("not", 1, x => (x.Car is bool b && !b),
+                           c("list", -1, x => x,
+                             c("display", 1,
+                               x => {
                                      Console.Write(Stringify(x.Car, false));
                                      return None;
-                                 },
-                                 c("newline", 0,
-                                   x => {
+                               },
+                               c("newline", 0,
+                                 x => {
                                        Console.WriteLine();
                                        return None;
-                                   },
-                                   c("read", 0, x => ReadExpression("", ""),
-                                     c("eof-object?", 1, x => x.Car == EOF,
-                                       c("symbol?", 1, x => x.Car is Sym,
-                                         G1)))))))))))))));
+                                 },
+                                 c("read", 0, x => ReadExpression("", ""),
+                                   c("eof-object?", 1, x => x.Car == EOF,
+                                     c("symbol?", 1, x => x.Car is Sym,
+                                       new Environment
+                                       (Sym.CallCC, CallCCVal,
+                                        new Environment
+                                        (Sym.Apply, ApplyVal,
+                                         G1))))))))))))))));
 
     // ----------------------------------------------------------------------
 
@@ -530,11 +528,11 @@ namespace LittleScheme {
         private static (object result, Environment env) ApplyFunction
         (object fun, Cell arg, Continuation k, Environment env) {
             for (;;) {
-                if (fun == Sym.CallCC) {
+                if (fun == CallCCVal) {
                     k.PushRestoreEnv(env);
                     fun = arg.Car;
                     arg = new Cell(new Continuation(k), null);
-                } else if (fun == Sym.Apply) {
+                } else if (fun == ApplyVal) {
                     fun = arg.Car;
                     arg = (Cell) ((Cell) arg.Cdr).Car;
                 } else {
