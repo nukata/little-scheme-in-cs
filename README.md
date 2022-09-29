@@ -26,11 +26,11 @@ it optimizes _tail calls_ and handles _first-class continuations_ properly.
 
 ## How to run
 
-With [Mono](https://www.mono-project.com) 6.8.0:
+With [Mono](https://www.mono-project.com) 6.12.0:
 
 ```
 $ csc -o -r:System.Numerics.dll arith.cs scm.cs
-Microsoft (R) Visual C# Compiler version 3.5.0-beta1-19606-04 (d2bd58c6)
+Microsoft (R) Visual C# Compiler version 3.9.0-6.21124.20 (db94f4cc)
 Copyright (C) Microsoft Corporation. All rights reserved.
 
 $ mono scm.exe
@@ -54,24 +54,21 @@ Press EOF (e.g. Control-D) to exit the session.
 $ 
 ```
 
-With [.NET Core](https://github.com/dotnet/core) 3.1.2:
+With [.NET](https://github.com/dotnet/core) 6.0.9:
 
 ```
 $ dotnet build -c Release
-Microsoft (R) Build Engine version 16.5.0+d4cbfca49 for .NET Core
-Copyright (C) Microsoft Corporation. All rights reserved.
-
-  Restore completed in 126.31 ms for /Users/suzuki/proj/little-scheme-in-cs/scm.
-csproj.
-  scm -> /Users/suzuki/proj/little-scheme-in-cs/bin/Release/netcoreapp3.1/scm.dl
-l
+MSBuild version 17.3.1+2badb37d1 for .NET
+  Determining projects to restore...
+  Restored /Users/suzuki/proj/little-scheme-in-cs/scm.csproj (in 38 ms).
+  scm -> /Users/suzuki/proj/little-scheme-in-cs/bin/Release/net6.0/scm.dll
 
 Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:01.11
-$ dotnet bin/Release/netcoreapp3.1/scm.dll
+Time Elapsed 00:00:00.65
+$ ./bin/Release/net6.0/scm
 > (+ 5 6)
 11
 > 
